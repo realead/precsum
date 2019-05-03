@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+precsum_impl.c
 
 # Distribution / packaging
 .Python
