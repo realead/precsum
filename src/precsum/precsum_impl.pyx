@@ -53,16 +53,15 @@ def pairwise_sum_1d(object obj):
     mem = BufferHolder(obj, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
     if mem.view.ndim !=1:
         raise BufferError("can handle only one-dimensional buffers")
-    if mem.view.format == NULL or mem.view.format[0]!=102 or mem.view.format[1]!=0:
+    if not format_is_float32(mem.view.format):
         raise BufferError("not float32 data")
     if mem.view.shape == NULL:
         raise BufferError("shape not set")
-    if mem.view.strides == NULL:
-        raise BufferError("stride not set")
     if mem.view.suboffsets != NULL:
         raise BufferError("cannot handle indirect buffer")
 
-    return pairwise_1dsum_FLOAT(<const float *>mem.view.buf, mem.view.shape[0], mem.view.strides[0]//mem.view.itemsize)
+    cdef unsigned int stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]//mem.view.itemsize
+    return pairwise_1dsum_FLOAT(<const float *>mem.view.buf, mem.view.shape[0], stride)
 
 
 
