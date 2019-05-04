@@ -2,6 +2,8 @@ import unittest
 
 import precsum as ps
 import numpy as np
+import array
+import ctypes
 
 
 class Sum2DTester(unittest.TestCase): 
@@ -137,6 +139,28 @@ class Sum2DTester(unittest.TestCase):
       with self.assertRaises(BufferError) as context:
             ps.pairwise_sum_2d(a,res,0)
       self.assertEqual("dimension missmatch between input(2) and output(3)", context.exception.args[0])
+
+
+   def test_ouput_array(self):
+      a=np.ones((2,2), dtype=np.float32)
+      res=array.array('f', [4,3])
+      ps.pairwise_sum_2d(a,res,0)
+      self.assertAlmostEqual(res[0], 2.0)
+      self.assertAlmostEqual(res[1], 2.0)
+
+
+   def test_input_ctypes_ouput_array(self):
+      a = ((ctypes.c_float * 2) * 2)()
+      a[0][0]=1.0
+      a[0][1]=2.0
+      a[1][0]=3.0
+      a[1][1]=4.0
+      res=array.array('f', [4,3])
+      ps.pairwise_sum_2d(a,res,0)
+      self.assertAlmostEqual(res[0], 4.0)
+      self.assertAlmostEqual(res[1], 6.0)
+
+
 
 
 
