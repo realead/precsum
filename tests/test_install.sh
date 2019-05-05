@@ -32,6 +32,9 @@ pip freeze
 #tests:
 sh run_unit_tests.sh
 
+echo "timeit performance tests running..."
+python timeit_performance.py | tee tmp_result_timeit.txt
+
 #clean or keep the environment
 if [ "$2" = "keep" ]; then
    echo "keeping enviroment $ENV_DIR"
