@@ -65,17 +65,17 @@ value_t pairwise_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
 
 
 #define ROW_COUNT 16
-void pairwise_blocksum_FLOAT(const value_t *a, value_t *output, index_t n, index_t stride_along, index_t m, index_t stride_crosswise)
+void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_crosswise, value_t *output, index_t stride_output)
 {
     //we trust m to be<=ROW_COUNT
     if (n < 8) {
         index_t i,j;
         for( j = 0; j < m; j++){
-               output[j]=a[j*stride_crosswise];
+               output[j*stride_output]=a[j*stride_crosswise];
             }
         for (i = 1; i < n; i++) { 
            for( j = 0; j < m; j++){          
-               output[j] += a[i * stride_along + j*stride_crosswise];
+               output[j*stride_output] += a[i * stride_along + j*stride_crosswise];
            }
         }
     }
@@ -108,14 +108,14 @@ void pairwise_blocksum_FLOAT(const value_t *a, value_t *output, index_t n, index
 
 
        for( j = 0; j < m; j++){          
-           output[j] = ((r[j][0] + r[j][1]) + (r[j][2] + r[j][3])) +
+           output[j*stride_output] = ((r[j][0] + r[j][1]) + (r[j][2] + r[j][3])) +
                        ((r[j][4] + r[j][5]) + (r[j][6] + r[j][7]));
        }
 
         /* do non multiple of 8 rest */
        for (; i < n; i++) {
             for(j = 0; j<m; j++){
-                output[j] += (a[i * stride_along + j*stride_crosswise]);
+                output[j*stride_output] += (a[i * stride_along + j*stride_crosswise]);
             }
        }
     }
@@ -125,23 +125,23 @@ void pairwise_blocksum_FLOAT(const value_t *a, value_t *output, index_t n, index
         n2 -= n2 % 8;
         value_t first[ROW_COUNT];
         value_t second[ROW_COUNT];
-        pairwise_blocksum_FLOAT(a, first, n2, stride_along, m, stride_crosswise);
-        pairwise_blocksum_FLOAT(a + n2 * stride_along, second, n - n2, stride_along, m, stride_crosswise);
+        pairwise_blocksum_FLOAT(a, n2, stride_along, m, stride_crosswise, first, 1);
+        pairwise_blocksum_FLOAT(a + n2 * stride_along, n - n2, stride_along, m, stride_crosswise, second, 1);
         for(index_t j = 0; j < m; j++){          
-           output[j] = first[j]+second[j];
+           output[j*stride_output] = first[j]+second[j];
        }
     }
 }
 
 
-void pairwise_2dsum_FLOAT(const value_t *a, value_t *output, index_t n, index_t stride_along, index_t m, index_t stride_crosswise){
+void pairwise_2dsum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_crosswise, value_t *output, index_t stride_output){
     while(m>ROW_COUNT){
-        pairwise_blocksum_FLOAT(a, output, n, stride_along, ROW_COUNT, stride_crosswise);
+        pairwise_blocksum_FLOAT(a, n, stride_along, ROW_COUNT, stride_crosswise, output, stride_output);
         a+=stride_crosswise*ROW_COUNT;
-        output+=ROW_COUNT; 
+        output+=stride_output*ROW_COUNT; 
         m-=ROW_COUNT; 
     }
-    pairwise_blocksum_FLOAT(a, output, n, stride_along, m, stride_crosswise);
+    pairwise_blocksum_FLOAT(a, n, stride_along, m, stride_crosswise, output, stride_output);
 }
 
 

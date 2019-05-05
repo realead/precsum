@@ -1,11 +1,12 @@
 
 from cpython cimport buffer, PyBuffer_Release
+# from libc.stdio cimport printf
 
 import sys
 
 cdef extern from "sum1d.c":
     float pairwise_1dsum_FLOAT(const float *ptr, unsigned int n, unsigned int stride)
-    void  pairwise_2dsum_FLOAT(const float *ptr, float *output, unsigned int n, unsigned int stride_along, unsigned int m, unsigned int stride_crosswise)
+    void  pairwise_2dsum_FLOAT(const float *ptr, unsigned int n, unsigned int stride_along, unsigned int m, unsigned int stride_crosswise, float *output, unsigned int stride_output)
 
 
 
@@ -107,8 +108,12 @@ def pairwise_sum_2d(object a, object output, unsigned int axis):
         stride_N = stride_N_in_bytes//mem_input.view.itemsize
         stride_M = stride_M_in_bytes//mem_input.view.itemsize
 
+    cdef unsigned int stride_output = 1 #  default value, if strides unset
+    if mem_output.view.strides != NULL:
+        stride_output = mem_output.view.strides[0]//mem_output.view.itemsize
 
-    pairwise_2dsum_FLOAT(<const float *>mem_input.view.buf, <float *>mem_output.view.buf, N, stride_N, M, stride_M)
+
+    pairwise_2dsum_FLOAT(<const float *>mem_input.view.buf, N, stride_N, M, stride_M, <float *>mem_output.view.buf, stride_output)
 
 
 

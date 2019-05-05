@@ -169,8 +169,34 @@ class Sum2DTester(unittest.TestCase):
       self.assertAlmostEqual(res[0], 4.0)
       self.assertAlmostEqual(res[1], 6.0)
 
+#check all branches also for noncont
 
+   def noncont_test(self, N):
+      a=np.ones((N,N), dtype=np.float32)
+      b=np.ones((N,2), dtype=np.float32)
+      res=b[:,0]
+      self.assertFalse(res.flags.contiguous)
+      ps.pairwise_sum_2d(a,res,0)
+      self.assertAlmostEqual(b[0,0], N)
+      self.assertAlmostEqual(b[N//2,0], N)
 
+   def test_ouput_noncontiguous_less8(self):
+      self.noncont_test(5)
+
+   def test_ouput_noncontiguous_8(self):
+      self.noncont_test(8)
+
+   def test_ouput_noncontiguous_mult8(self):
+      self.noncont_test(64)
+
+   def test_ouput_noncontiguous_mult8(self):
+      self.noncont_test(70)
+
+   def test_ouput_noncontiguous_128(self):
+      self.noncont_test(128)
+
+   def test_ouput_noncontiguous_larger128(self):
+      self.noncont_test(1000)
 
 
 
