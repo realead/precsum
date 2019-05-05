@@ -148,6 +148,15 @@ class Sum2DTester(unittest.TestCase):
       self.assertAlmostEqual(res[0], 2.0)
       self.assertAlmostEqual(res[1], 2.0)
 
+   def test_ouput_ctypes(self):
+      a=np.ones((2,2), dtype=np.float32)
+      res=(ctypes.c_float * 2)()
+      res[0]=1.0
+      res[1]=1.0
+      ps.pairwise_sum_2d(a,res,0)
+      self.assertAlmostEqual(res[0], 2.0)
+      self.assertAlmostEqual(res[1], 2.0)
+
 
    def test_input_ctypes_ouput_array(self):
       a = ((ctypes.c_float * 2) * 2)()
