@@ -5,7 +5,7 @@ from cpython cimport buffer, PyBuffer_Release
 
 import sys
 
-cdef extern from "sum1d.c":
+cdef extern from "pairwise_sum.c":
     float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
     void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
 
