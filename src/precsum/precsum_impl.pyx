@@ -142,10 +142,20 @@ cdef extern from "pairwise_sum.c":
     void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
 
 
+################# kahan summation:
+
+cdef extern from "kahan_sum.c":
+    float naive_kahan_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
+
+
+
 ############  python interface:
 
 def pairwise_sum_1d(object obj):
     return sum_1d(obj, pairwise_1dsum_FLOAT)
+
+def kahan_sum_1d(object obj):
+    return sum_1d(obj, naive_kahan_1dsum_FLOAT)
 
 
 def pairwise_sum_2d(object a, object output, int axis):
