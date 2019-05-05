@@ -112,8 +112,16 @@ def pairwise_sum_2d(object a, object output, int axis):
     if mem_output.view.strides != NULL:
         stride_output = mem_output.view.strides[0]//mem_output.view.itemsize
 
-
-    pairwise_2dsum_FLOAT(<const float *>mem_input.view.buf, N, stride_N, M, stride_M, <float *>mem_output.view.buf, stride_output)
+    cdef const float * input_buf = <const float *>mem_input.view.buf
+    cdef float * output_buf = <float *>mem_output.view.buf
+    cdef Py_ssize_t i
+    if stride_N < stride_M:
+        for i in range(M):
+            output_buf[i*stride_output] = pairwise_1dsum_FLOAT(input_buf, N, stride_N)
+            input_buf+=stride_M
+        
+    else:       
+        pairwise_2dsum_FLOAT(input_buf, N, stride_N, M, stride_M, output_buf, stride_output)
 
 
 
