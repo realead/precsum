@@ -67,7 +67,7 @@ value_t pairwise_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
 }
 
 
-#define ROW_COUNT 16
+#define ROW_COUNT 32
 void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_crosswise, value_t *output, index_t stride_output)
 {
     //we trust m to be<=ROW_COUNT
