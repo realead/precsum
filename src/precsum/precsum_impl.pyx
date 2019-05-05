@@ -3,13 +3,10 @@ cimport cython
 from cpython cimport buffer, PyBuffer_Release
 # from libc.stdio cimport printf
 
+
+### helper functions:
+
 import sys
-
-cdef extern from "pairwise_sum.c":
-    float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
-    void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
-
-
 
 cdef class BufferHolder: 
     cdef buffer.Py_buffer view
@@ -51,8 +48,13 @@ cdef bint format_is_float32(const char *format):
     return 0
 
 
+####  1d summation:
+
+ctypedef float(*sum1d_type)(const float *, Py_ssize_t, Py_ssize_t)
+
+
 @cython.cdivision(True) 
-def pairwise_sum_1d(object obj):
+cdef sum_1d(object obj, sum1d_type worker): #returns PyObject, so the errors are propagated!
     #use buffer protocol:
     mem = BufferHolder(obj, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
     if mem.view.ndim !=1:
@@ -65,10 +67,11 @@ def pairwise_sum_1d(object obj):
         raise BufferError("cannot handle indirect buffer")
 
     cdef Py_ssize_t stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]/mem.view.itemsize
-    return pairwise_1dsum_FLOAT(<const float *>mem.view.buf, mem.view.shape[0], stride)
+    return worker(<const float *>mem.view.buf, mem.view.shape[0], stride)
 
 
-
+######### 2d summation:
+ 
 @cython.cdivision(True) 
 def pairwise_sum_2d(object a, object output, int axis):
     #use buffer protocol:
@@ -127,6 +130,17 @@ def pairwise_sum_2d(object a, object output, int axis):
         pairwise_2dsum_FLOAT(input_buf, N, stride_N, M, stride_M, output_buf, stride_output)
 
 
+################# pairwise summation:
+
+cdef extern from "pairwise_sum.c":
+    float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
+    void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
+
+
+############  python interface:
+
+def pairwise_sum_1d(object obj):
+    return sum_1d(obj, pairwise_1dsum_FLOAT)
 
 
 
