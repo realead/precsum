@@ -1,10 +1,13 @@
 #define BLOCKSIZE 128
 
 
-//similar to pairwise implementation of numpy's pairwise_add
 
-typedef unsigned int index_t;
+// needs include of <Python.h> to work
+typedef Py_ssize_t index_t;
 typedef float value_t;
+
+
+// similar to pairwise implementation of numpy's pairwise_add
 value_t pairwise_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
 {
     if (n < 8) {

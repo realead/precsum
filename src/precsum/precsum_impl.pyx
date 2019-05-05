@@ -5,8 +5,8 @@ from cpython cimport buffer, PyBuffer_Release
 import sys
 
 cdef extern from "sum1d.c":
-    float pairwise_1dsum_FLOAT(const float *ptr, unsigned int n, unsigned int stride)
-    void  pairwise_2dsum_FLOAT(const float *ptr, unsigned int n, unsigned int stride_along, unsigned int m, unsigned int stride_crosswise, float *output, unsigned int stride_output)
+    float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
+    void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
 
 
 
@@ -61,13 +61,13 @@ def pairwise_sum_1d(object obj):
     if mem.view.suboffsets != NULL:
         raise BufferError("cannot handle indirect buffer")
 
-    cdef unsigned int stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]//mem.view.itemsize
+    cdef Py_ssize_t stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]//mem.view.itemsize
     return pairwise_1dsum_FLOAT(<const float *>mem.view.buf, mem.view.shape[0], stride)
 
 
 
 
-def pairwise_sum_2d(object a, object output, unsigned int axis):
+def pairwise_sum_2d(object a, object output, int axis):
     #use buffer protocol:
     mem_input = BufferHolder(a,     buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
     mem_output = BufferHolder(output, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
@@ -87,16 +87,16 @@ def pairwise_sum_2d(object a, object output, unsigned int axis):
         raise BufferError("cannot handle indirect buffer as ouput")
 
 
-    cdef unsigned int N = mem_input.view.shape[0] if axis == 0  else mem_input.view.shape[1]
-    cdef unsigned int M = mem_input.view.shape[1] if axis == 0  else mem_input.view.shape[0]
+    cdef Py_ssize_t N = mem_input.view.shape[0] if axis == 0  else mem_input.view.shape[1]
+    cdef Py_ssize_t M = mem_input.view.shape[1] if axis == 0  else mem_input.view.shape[0]
 
     if M != mem_output.view.shape[0]:
         raise BufferError("dimension missmatch between input({0}) and output({1})".format(M, mem_output.view.shape[0]))
 
     
     ## handle strides:
-    cdef unsigned int stride_N, stride_M
-    cdef unsigned int stride_N_in_bytes, stride_M_in_bytes
+    cdef Py_ssize_t stride_N, stride_M
+    cdef Py_ssize_t stride_N_in_bytes, stride_M_in_bytes
     # strides = NULL implies the usual C-memory layout:
     # is for example used by ctypes
     if mem_input.view.strides == NULL:
@@ -108,7 +108,7 @@ def pairwise_sum_2d(object a, object output, unsigned int axis):
         stride_N = stride_N_in_bytes//mem_input.view.itemsize
         stride_M = stride_M_in_bytes//mem_input.view.itemsize
 
-    cdef unsigned int stride_output = 1 #  default value, if strides unset
+    cdef Py_ssize_t stride_output = 1 #  default value, if strides unset
     if mem_output.view.strides != NULL:
         stride_output = mem_output.view.strides[0]//mem_output.view.itemsize
 
