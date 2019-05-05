@@ -1,4 +1,5 @@
 
+cimport cython
 from cpython cimport buffer, PyBuffer_Release
 # from libc.stdio cimport printf
 
@@ -23,6 +24,7 @@ cdef class BufferHolder:
 
 
 # checks different possible formats for float32
+cdef bint is_little_endian = (sys.byteorder == 'little')
 cdef bint format_is_float32(const char *format):
     if format == NULL:
         return 0
@@ -37,7 +39,7 @@ cdef bint format_is_float32(const char *format):
     if format[0] == 64 and format[1] == 102 and format[2]==0:
        return 1
 
-    if sys.byteorder == 'little':
+    if is_little_endian:
         #accepting little endian "<f"-format on my system:
         if format[0] == 60 and format[1] == 102 and format[2]==0:
             return 1
@@ -49,6 +51,7 @@ cdef bint format_is_float32(const char *format):
     return 0
 
 
+@cython.cdivision(True) 
 def pairwise_sum_1d(object obj):
     #use buffer protocol:
     mem = BufferHolder(obj, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
@@ -61,12 +64,12 @@ def pairwise_sum_1d(object obj):
     if mem.view.suboffsets != NULL:
         raise BufferError("cannot handle indirect buffer")
 
-    cdef Py_ssize_t stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]//mem.view.itemsize
+    cdef Py_ssize_t stride = 1 if mem.view.strides == NULL  else mem.view.strides[0]/mem.view.itemsize
     return pairwise_1dsum_FLOAT(<const float *>mem.view.buf, mem.view.shape[0], stride)
 
 
 
-
+@cython.cdivision(True) 
 def pairwise_sum_2d(object a, object output, int axis):
     #use buffer protocol:
     mem_input = BufferHolder(a,     buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
@@ -105,12 +108,12 @@ def pairwise_sum_2d(object a, object output, int axis):
     else:
         stride_N_in_bytes = mem_input.view.strides[0] if axis == 0  else mem_input.view.strides[1]
         stride_M_in_bytes = mem_input.view.strides[1] if axis == 0  else mem_input.view.strides[0]
-        stride_N = stride_N_in_bytes//mem_input.view.itemsize
-        stride_M = stride_M_in_bytes//mem_input.view.itemsize
+        stride_N = stride_N_in_bytes/mem_input.view.itemsize
+        stride_M = stride_M_in_bytes/mem_input.view.itemsize
 
     cdef Py_ssize_t stride_output = 1 #  default value, if strides unset
     if mem_output.view.strides != NULL:
-        stride_output = mem_output.view.strides[0]//mem_output.view.itemsize
+        stride_output = mem_output.view.strides[0]/mem_output.view.itemsize
 
     cdef const float * input_buf = <const float *>mem_input.view.buf
     cdef float * output_buf = <float *>mem_output.view.buf
