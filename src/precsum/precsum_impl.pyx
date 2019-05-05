@@ -50,6 +50,8 @@ cdef bint format_is_float32(const char *format):
 
 ####  1d summation:
 
+# prototype:
+# float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
 ctypedef float(*sum1d_type)(const float *, Py_ssize_t, Py_ssize_t)
 
 
@@ -71,10 +73,13 @@ cdef sum_1d(object obj, sum1d_type worker): #returns PyObject, so the errors are
 
 
 ######### 2d summation:
- 
+
+# prototype: 
+# void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
+ctypedef void(*sum2d_type)(const float *, Py_ssize_t, Py_ssize_t,  Py_ssize_t, Py_ssize_t, float *, Py_ssize_t)
+
 @cython.cdivision(True) 
-def pairwise_sum_2d(object a, object output, int axis):
-    #use buffer protocol:
+cdef void sum_2d(object a, object output, int axis, sum1d_type worker1d, sum2d_type worker2d) except *:
     mem_input = BufferHolder(a,     buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
     mem_output = BufferHolder(output, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
     if mem_input.view.ndim !=2:
@@ -123,11 +128,11 @@ def pairwise_sum_2d(object a, object output, int axis):
     cdef Py_ssize_t i
     if stride_N < stride_M:
         for i in range(M):
-            output_buf[i*stride_output] = pairwise_1dsum_FLOAT(input_buf, N, stride_N)
+            output_buf[i*stride_output] = worker1d(input_buf, N, stride_N)
             input_buf+=stride_M
         
     else:       
-        pairwise_2dsum_FLOAT(input_buf, N, stride_N, M, stride_M, output_buf, stride_output)
+        worker2d(input_buf, N, stride_N, M, stride_M, output_buf, stride_output)
 
 
 ################# pairwise summation:
@@ -141,6 +146,10 @@ cdef extern from "pairwise_sum.c":
 
 def pairwise_sum_1d(object obj):
     return sum_1d(obj, pairwise_1dsum_FLOAT)
+
+
+def pairwise_sum_2d(object a, object output, int axis):
+    sum_2d(a, output, axis, pairwise_1dsum_FLOAT, pairwise_2dsum_FLOAT)
 
 
 
