@@ -33,6 +33,9 @@ pip freeze
 sh run_unit_tests.sh
 
 echo "timeit performance tests running..."
+echo "  1d performance tests..."
+python timeit_performance_1d.py | tee tmp_result_timeit_1d.txt
+echo "  2d performance tests..."
 python timeit_performance.py | tee tmp_result_timeit.txt
 
 #clean or keep the environment

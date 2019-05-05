@@ -9,6 +9,7 @@ precsum_impl.c
 
 #tmps:
 tmp_result_timeit.txt
+tmp_result_timeit_1d.txt
 
 # Distribution / packaging
 .Python
