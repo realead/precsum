@@ -81,7 +81,7 @@ void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, 
     }
     else if (n <= BLOCKSIZE) {
         index_t i,j;
-        value_t r[ROW_COUNT][8], res;
+        value_t r[ROW_COUNT][8];
 
         for(j = 0; j<m; j++){
             r[j][0] = (a[0 * stride_along + j*stride_crosswise]);
