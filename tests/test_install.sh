@@ -8,7 +8,8 @@ virtualenv -p python3 "$ENV_DIR"
 
 #install needed packages:
 pip install cython
-pip install numpy #needed for testing
+pip install numpy # needed for testing
+pip install https://github.com/realead/uttemplate/zipball/master # needed for testing
 
 
 if [ "$1" = "from-github" ]; then
