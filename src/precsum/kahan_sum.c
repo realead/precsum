@@ -33,7 +33,7 @@ value_t kahan_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
     value_t sum[9]; 
     value_t c[8] = {0.0f};
 
-    //urolling
+    //unrolling
     sum[0] = (a[0 * stride]);
     sum[1] = (a[1 * stride]);
     sum[2] = (a[2 * stride]);
@@ -81,7 +81,7 @@ value_t kahan_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
         sum[6] = t[6];
         sum[7] = t[7];
      }
-     sum[8] = naive_kahan_1dsum_FLOAT(a+i,n-i,stride);
+     sum[8] = naive_kahan_1dsum_FLOAT(a+stride*i,n-i,stride);
      return naive_kahan_1dsum_FLOAT(sum,9,1);
 }
 

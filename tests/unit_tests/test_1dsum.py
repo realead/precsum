@@ -54,7 +54,7 @@ class Sum1DTester(unittest.TestCase):
       self.assertAlmostEqual(res, 3.0)
 
 
-########  different sizes
+########  different sizes:
 
    def diff_sizes_test(self, fun, N):
       a=np.ones(N, dtype=np.float32)
@@ -79,6 +79,39 @@ class Sum1DTester(unittest.TestCase):
    def template_non_mulitple128(self, fun):
       self.diff_sizes_test(fun, 1000)
 
+   def template_non_multiple8_bruteforce(self, fun):
+      for i in range(1,500):
+          self.diff_sizes_test(fun, i)
+
+######## input non-contiguous:
+
+   def diff_sizes_noncont_test(self, fun, N):
+      a=np.ones((N,3), dtype=np.float32)
+      a[:,1]=2.0
+      a[:,2]=3.0
+      b=a[:,0]
+      self.assertFalse(b.flags.contiguous)
+      self.assertAlmostEqual(fun(b), N)
 
 
+   def template_less8_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 7)
 
+   def template_mulitple8_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 64)
+
+   def template_non_multiple8_noncont_bruteforce(self, fun):
+      for i in range(2,500):
+          self.diff_sizes_noncont_test(fun, i)
+
+   def template_non_multiple8_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 127)
+
+   def template_128_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 128)
+
+   def template_mulitple128_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 512)
+
+   def template_non_mulitple128_noncont(self, fun):
+      self.diff_sizes_noncont_test(fun, 1000)
