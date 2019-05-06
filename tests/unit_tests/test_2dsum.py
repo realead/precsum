@@ -202,3 +202,24 @@ class Sum2DTester(unittest.TestCase):
 
 
 
+####### random-tests:
+
+   def random_test(self, fun, seed):
+       np.random.seed(seed)
+       N,M=np.random.randint(3,1000,size=2)
+       A=np.random.randint(3,1000,size=(N,M)).astype(np.float32)
+       
+       for axis in [0,1]:
+           Nres = A.shape[1] if axis == 0 else A.shape[0]
+           res_np=A.sum(axis=axis)     
+           res_ps=np.empty(Nres, dtype=np.float32)
+           fun(A, res_ps, axis)
+           np.testing.assert_almost_equal(res_np, res_ps)
+
+
+
+   def template_random_tests(self, fun):
+        for i in range(200):
+            self.random_test(fun, i)
+
+
