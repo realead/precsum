@@ -115,3 +115,24 @@ class Sum1DTester(unittest.TestCase):
 
    def template_non_mulitple128_noncont(self, fun):
       self.diff_sizes_noncont_test(fun, 1000)
+
+
+####### random-tests:
+
+   def random_test(self, fun, seed):
+       np.random.seed(seed)
+       N,M=np.random.randint(3,1000,size=2)
+       A=np.random.randint(3,1000,size=(N,M)).astype(np.float32)
+       for i  in range(M):
+            a=A[:,i]
+            np_value = np.sum(a)
+            ps_value = fun(a)
+            self.assertFalse(a.flags.contiguous)
+            self.assertAlmostEqual(ps_value, np_value)
+
+
+   def template_random_tests(self, fun):
+        for i in range(100):
+            self.random_test(fun, i)
+
+   
