@@ -54,3 +54,31 @@ class Sum1DTester(unittest.TestCase):
       self.assertAlmostEqual(res, 3.0)
 
 
+########  different sizes
+
+   def diff_sizes_test(self, fun, N):
+      a=np.ones(N, dtype=np.float32)
+      self.assertAlmostEqual(fun(a), N)
+
+
+   def template_less8(self, fun):
+      self.diff_sizes_test(fun, 7)
+
+   def template_mulitple8(self, fun):
+      self.diff_sizes_test(fun, 64)
+
+   def template_non_multiple8(self, fun):
+      self.diff_sizes_test(fun, 127)
+
+   def template_128(self, fun):
+      self.diff_sizes_test(fun, 128)
+
+   def template_mulitple128(self, fun):
+      self.diff_sizes_test(fun, 512)
+
+   def template_non_mulitple128(self, fun):
+      self.diff_sizes_test(fun, 1000)
+
+
+
+
