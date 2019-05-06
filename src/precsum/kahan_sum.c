@@ -64,22 +64,22 @@ value_t kahan_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
         t[7] = sum[7]+y[7];
 
         c[0] = (t[0]-sum[0])-y[0];
-        c[1] = (t[0]-sum[1])-y[1];
-        c[2] = (t[0]-sum[2])-y[2];
-        c[3] = (t[0]-sum[3])-y[3];
-        c[4] = (t[0]-sum[4])-y[4];
-        c[5] = (t[0]-sum[5])-y[5];
-        c[6] = (t[0]-sum[6])-y[6];
-        c[7] = (t[0]-sum[7])-y[7];
+        c[1] = (t[1]-sum[1])-y[1];
+        c[2] = (t[2]-sum[2])-y[2];
+        c[3] = (t[3]-sum[3])-y[3];
+        c[4] = (t[4]-sum[4])-y[4];
+        c[5] = (t[5]-sum[5])-y[5];
+        c[6] = (t[6]-sum[6])-y[6];
+        c[7] = (t[7]-sum[7])-y[7];
 
-        sum[0] = (t[0]-sum[0])-y[0];
-        sum[1] = (t[0]-sum[1])-y[1];
-        sum[2] = (t[0]-sum[2])-y[2];
-        sum[3] = (t[0]-sum[3])-y[3];
-        sum[4] = (t[0]-sum[4])-y[4];
-        sum[5] = (t[0]-sum[5])-y[5];
-        sum[6] = (t[0]-sum[6])-y[6];
-        sum[7] = (t[0]-sum[7])-y[7];
+        sum[0] = t[0];
+        sum[1] = t[1];
+        sum[2] = t[2];
+        sum[3] = t[3];
+        sum[4] = t[4];
+        sum[5] = t[5];
+        sum[6] = t[6];
+        sum[7] = t[7];
      }
      sum[8] = naive_kahan_1dsum_FLOAT(a+i,n-i,stride);
      return naive_kahan_1dsum_FLOAT(sum,9,1);
