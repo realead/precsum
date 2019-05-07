@@ -68,17 +68,17 @@ value_t pairwise_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
 
 
 #define ROW_COUNT 32
-void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_crosswise, value_t *output, index_t stride_output)
+void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_across, value_t *output, index_t stride_output)
 {
     //we trust m to be<=ROW_COUNT
     if (n < 8) {
         index_t i,j;
         for( j = 0; j < m; j++){
-               output[j*stride_output]=a[j*stride_crosswise];
+               output[j*stride_output]=a[j*stride_across];
             }
         for (i = 1; i < n; i++) { 
            for( j = 0; j < m; j++){          
-               output[j*stride_output] += a[i * stride_along + j*stride_crosswise];
+               output[j*stride_output] += a[i * stride_along + j*stride_across];
            }
         }
     }
@@ -87,25 +87,25 @@ void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, 
         value_t r[ROW_COUNT][8];
 
         for(j = 0; j<m; j++){
-            r[j][0] = (a[0 * stride_along + j*stride_crosswise]);
-            r[j][1] = (a[1 * stride_along + j*stride_crosswise]);
-            r[j][2] = (a[2 * stride_along + j*stride_crosswise]);
-            r[j][3] = (a[3 * stride_along + j*stride_crosswise]);
-            r[j][4] = (a[4 * stride_along + j*stride_crosswise]);
-            r[j][5] = (a[5 * stride_along + j*stride_crosswise]);
-            r[j][6] = (a[6 * stride_along + j*stride_crosswise]);
-            r[j][7] = (a[7 * stride_along + j*stride_crosswise]);
+            r[j][0] = (a[0 * stride_along + j*stride_across]);
+            r[j][1] = (a[1 * stride_along + j*stride_across]);
+            r[j][2] = (a[2 * stride_along + j*stride_across]);
+            r[j][3] = (a[3 * stride_along + j*stride_across]);
+            r[j][4] = (a[4 * stride_along + j*stride_across]);
+            r[j][5] = (a[5 * stride_along + j*stride_across]);
+            r[j][6] = (a[6 * stride_along + j*stride_across]);
+            r[j][7] = (a[7 * stride_along + j*stride_across]);
         }
         for (i = 8; i < n - (n % 8); i += 8) {
           for(j = 0; j<m; j++){
-            r[j][0] += (a[(i + 0) * stride_along + j*stride_crosswise]);
-            r[j][1] += (a[(i + 1) * stride_along + j*stride_crosswise]);
-            r[j][2] += (a[(i + 2) * stride_along + j*stride_crosswise]);
-            r[j][3] += (a[(i + 3) * stride_along + j*stride_crosswise]);
-            r[j][4] += (a[(i + 4) * stride_along + j*stride_crosswise]);
-            r[j][5] += (a[(i + 5) * stride_along + j*stride_crosswise]);
-            r[j][6] += (a[(i + 6) * stride_along + j*stride_crosswise]);
-            r[j][7] += (a[(i + 7) * stride_along + j*stride_crosswise]);
+            r[j][0] += (a[(i + 0) * stride_along + j*stride_across]);
+            r[j][1] += (a[(i + 1) * stride_along + j*stride_across]);
+            r[j][2] += (a[(i + 2) * stride_along + j*stride_across]);
+            r[j][3] += (a[(i + 3) * stride_along + j*stride_across]);
+            r[j][4] += (a[(i + 4) * stride_along + j*stride_across]);
+            r[j][5] += (a[(i + 5) * stride_along + j*stride_across]);
+            r[j][6] += (a[(i + 6) * stride_along + j*stride_across]);
+            r[j][7] += (a[(i + 7) * stride_along + j*stride_across]);
           }
         }
 
@@ -118,7 +118,7 @@ void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, 
         /* do non multiple of 8 rest */
        for (; i < n; i++) {
             for(j = 0; j<m; j++){
-                output[j*stride_output] += (a[i * stride_along + j*stride_crosswise]);
+                output[j*stride_output] += (a[i * stride_along + j*stride_across]);
             }
        }
     }
@@ -128,8 +128,8 @@ void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, 
         n2 -= n2 % 8;
         value_t first[ROW_COUNT];
         value_t second[ROW_COUNT];
-        pairwise_blocksum_FLOAT(a, n2, stride_along, m, stride_crosswise, first, 1);
-        pairwise_blocksum_FLOAT(a + n2 * stride_along, n - n2, stride_along, m, stride_crosswise, second, 1);
+        pairwise_blocksum_FLOAT(a, n2, stride_along, m, stride_across, first, 1);
+        pairwise_blocksum_FLOAT(a + n2 * stride_along, n - n2, stride_along, m, stride_across, second, 1);
         for(index_t j = 0; j < m; j++){          
            output[j*stride_output] = first[j]+second[j];
        }
@@ -137,14 +137,14 @@ void pairwise_blocksum_FLOAT(const value_t *a, index_t n, index_t stride_along, 
 }
 
 
-void pairwise_2dsum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_crosswise, value_t *output, index_t stride_output){
+void pairwise_2dsum_FLOAT(const value_t *a, index_t n, index_t stride_along, index_t m, index_t stride_across, value_t *output, index_t stride_output){
     while(m>ROW_COUNT){
-        pairwise_blocksum_FLOAT(a, n, stride_along, ROW_COUNT, stride_crosswise, output, stride_output);
-        a+=stride_crosswise*ROW_COUNT;
+        pairwise_blocksum_FLOAT(a, n, stride_along, ROW_COUNT, stride_across, output, stride_output);
+        a+=stride_across*ROW_COUNT;
         output+=stride_output*ROW_COUNT; 
         m-=ROW_COUNT; 
     }
-    pairwise_blocksum_FLOAT(a, n, stride_along, m, stride_crosswise, output, stride_output);
+    pairwise_blocksum_FLOAT(a, n, stride_along, m, stride_across, output, stride_output);
 }
 
 
