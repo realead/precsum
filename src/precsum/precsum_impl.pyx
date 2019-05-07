@@ -172,7 +172,7 @@ def pairwise_sum_2d(object a, object output, int axis):
     sum_2d(a, output, axis, pairwise_1dsum_FLOAT, pairwise_2dsum_FLOAT)
 
 def kahan_sum_2d(object a, object output, int axis):
-    sum_2d(a, output, axis, pairwise_1dsum_FLOAT, kahan_2dsum_FLOAT)
+    sum_2d(a, output, axis, kahan_1dsum_FLOAT, kahan_2dsum_FLOAT)
 
 
 
