@@ -21,12 +21,17 @@ def timeit_kahan(n_rows, number=100):
    stmt = "ps.kahan_sum_1d(a)"
    return min(timeit.repeat(stmt=stmt, setup=setup, repeat=5, number=number))/number
 
+def timeit_neumaier(n_rows, number=100):
+   setup = common_setup.format(N=n_rows)
+   stmt = "ps.neumaier_sum_1d(a)"
+   return min(timeit.repeat(stmt=stmt, setup=setup, repeat=5, number=number))/number
+
 
 
 
 test_cases = ((10**1,100), (10**2, 100), (10**3, 100),
               (10**4,100), (10**5, 100), (10**6, 10),
-              (10**7,10), (10**8, 5),
+              (10**7,10), #(10**8, 5),
              )
 
 
@@ -35,4 +40,10 @@ for test_case in test_cases:
     numpy_time = timeit_numpy(*test_case)
     pairwise_time = timeit_pairwise(*test_case)
     kahan_time = timeit_kahan(*test_case)
-    print(test_case,": np=", numpy_time, " ps=", pairwise_time, " kahan=", kahan_time, " factor numpy/ps=", numpy_time/pairwise_time, " factor numpy/kahan=", numpy_time/kahan_time)
+    neumaier_time = timeit_neumaier(*test_case)
+    print(test_case,":")
+    print("  np=", numpy_time)
+    print("  pairwise=", pairwise_time, " factor numpy/pairwise=", numpy_time/pairwise_time)
+    print("  kahan=", kahan_time,  " factor pairwise/kahan=", pairwise_time/kahan_time)
+    print("  neumaier=", neumaier_time,  " factor kahan/neumaier=", kahan_time/neumaier_time)
+

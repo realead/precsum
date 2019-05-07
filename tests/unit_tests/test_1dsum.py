@@ -8,7 +8,7 @@ import ctypes
 
 import uttemplate
 
-@uttemplate.from_templates([ps.pairwise_sum_1d, ps.kahan_sum_1d])
+@uttemplate.from_templates([ps.pairwise_sum_1d, ps.kahan_sum_1d, ps.neumaier_sum_1d])
 class Sum1DTester(unittest.TestCase): 
 
    def template_sum(self, fun):
