@@ -7,7 +7,7 @@ import ctypes
 
 import uttemplate
 
-@uttemplate.from_templates([ps.pairwise_sum_2d, ps.kahan_sum_2d])
+@uttemplate.from_templates([ps.pairwise_sum_2d, ps.kahan_sum_2d, ps.kahan_sum_2d])
 class Sum2DTester(unittest.TestCase): 
 
    def template_sum_axis0(self, fun):
