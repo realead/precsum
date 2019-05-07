@@ -16,6 +16,12 @@ class Sum1DTester(unittest.TestCase):
       s = fun(a)
       self.assertAlmostEqual(s, 6.0)
 
+   def template_sum_readonly(self, fun):
+      a=np.array([1,2,3], dtype=np.float32)
+      a.flags.writeable=False
+      s = fun(a)
+      self.assertAlmostEqual(s, 6.0)
+
    def template_prec_sum(self, fun):
       a=np.ones(10**8, dtype=np.float32)
       s = fun(a)

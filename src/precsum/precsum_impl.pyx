@@ -81,7 +81,7 @@ ctypedef void(*sum2d_type)(const float *, Py_ssize_t, Py_ssize_t,  Py_ssize_t, P
 @cython.cdivision(True) 
 cdef void sum_2d(object a, object output, int axis, sum1d_type worker1d, sum2d_type worker2d) except *:
     mem_input = BufferHolder(a,     buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
-    mem_output = BufferHolder(output, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES)
+    mem_output = BufferHolder(output, buffer.PyBUF_FORMAT|buffer.PyBUF_STRIDES|buffer.PyBUF_WRITABLE)
     if mem_input.view.ndim !=2:
         raise BufferError("input must be a two-dimensional buffer") 
     if mem_input.view.ndim <= axis:

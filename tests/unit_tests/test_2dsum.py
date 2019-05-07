@@ -18,6 +18,15 @@ class Sum2DTester(unittest.TestCase):
       self.assertAlmostEqual(res[1], 7.0)
       self.assertAlmostEqual(res[2], 9.0)
 
+   def template_sum_readonly(self, fun):
+      a=np.array([[1,2,3], [4,5,6]], dtype=np.float32)
+      a.flags.writeable=False
+      res=np.ones(3,dtype=np.float32)
+      fun(a,res,0)
+      self.assertAlmostEqual(res[0], 5.0)
+      self.assertAlmostEqual(res[1], 7.0)
+      self.assertAlmostEqual(res[2], 9.0)
+
    def template_sum_axis1(self, fun):
       a=np.array([[1,2,3], [4,5,6]], dtype=np.float32)
       res=np.ones(2,dtype=np.float32)
@@ -98,6 +107,14 @@ class Sum2DTester(unittest.TestCase):
 
 
 # errors:
+
+   def template_to_readonly(self, fun):
+      a=np.ones((2,2), dtype=np.float32)
+      res=np.ones(2,dtype=np.float32)
+      res.flags.writeable = False
+      with self.assertRaises(ValueError) as context:
+            fun(a,res,0)
+      self.assertTrue("read-only" in context.exception.args[0])
 
    def template_non2d(self, fun):
       a=np.ones((2,2,2), dtype=np.float32)
