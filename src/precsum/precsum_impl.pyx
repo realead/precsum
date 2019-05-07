@@ -139,6 +139,7 @@ cdef void sum_2d(object a, object output, int axis, sum1d_type worker1d, sum2d_t
 
 cdef extern from "pairwise_sum.c":
     float pairwise_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
+    float doubleprecision_1dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride)
     void  pairwise_2dsum_FLOAT(const float *ptr, Py_ssize_t n, Py_ssize_t stride_along,  Py_ssize_t m, Py_ssize_t stride_crosswise, float *output, Py_ssize_t stride_output)
 
 
@@ -157,6 +158,9 @@ cdef extern from "neumaier_sum.c":
 
 
 ############  python interface:
+
+def doubleprecision_sum_1d(object obj):
+    return sum_1d(obj, doubleprecision_1dsum_FLOAT)
 
 def pairwise_sum_1d(object obj):
     return sum_1d(obj, pairwise_1dsum_FLOAT)
