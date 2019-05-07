@@ -33,7 +33,10 @@ pip freeze
 #tests:
 sh run_unit_tests.sh
 
-echo "timeit performance tests running..."
+echo "\nprecision performance tests running..."
+python precision_performance_1d.py | tee tmp_result_precision_1d.txt
+
+echo "\ntimeit performance tests running..."
 echo "  1d performance tests..."
 python timeit_performance_1d.py | tee tmp_result_timeit_1d.txt
 echo "  2d performance tests..."
