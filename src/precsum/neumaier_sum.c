@@ -37,8 +37,8 @@ value_t neumaier_1dsum_FLOAT(const value_t *a, index_t n, index_t stride)
     }
     
     index_t i;
-    value_t sum[8]={0.0f}; 
-    value_t c[9] = {0.0f};
+    value_t sum[9]; 
+    value_t c[8] = {0.0f};
 
     //unrolling
     sum[0] = (a[0 * stride]);
