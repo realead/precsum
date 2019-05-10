@@ -145,14 +145,25 @@ Noteworthy details (see `tests/timeit_performance.py`):
   * `np.sum` uses pairwise summation only when summing along contignuous axis, `precsum`-methods always.
   * the relation between `precsum`-performances is similar to 1D case.
   * the relation between `pairwise` and `np.sum` is similar to 1D case when summing along contignuous axis.
-  * when summing along non-contignuous axis, `pairwise` is worse for short series (about 1000 elements, up to factor 3 slower), but much faster for long series  (about 100000 elements, up to factor 10).
+  * when summing along non-contignuous axis, `pairwise` is worse for short series (about 1000 elements,  the more cols the worse, up to factor 10 slower), but much faster for long series  (about 100000 elements, up to factor 10). 
+
 
 The reason for that is, that `pairwise` has a less efficient code, which uses better the caching:
 
   * numpy adds rowwise, which means less read-cache-misses, but the resulting vector gets evicted from the cache once the dimension becomes long.
   * `pairwise`loads memory in tiles and the accumulator stays hot in cache even for larger series.
 
-    
+
+Here are some measurements: 
+
+![1](imgs/32xN.png)
+
+![2](imgs/Nx100.png)
+
+![3](imgs/Nx200.png)
+
+Can it be, that for some big sizes, data no longer fits L2/L3 cache and the calculation is dominated by memory bandwidth anyway?
+
 ## Testing:
 
 For testing of the local version run:
